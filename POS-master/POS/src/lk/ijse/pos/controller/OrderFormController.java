@@ -20,7 +20,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import lk.ijse.pos.dao.CustomerDAOImpl;
+import lk.ijse.pos.dao.ItemDAOImpl;
 import lk.ijse.pos.db.DBConnection;
+import lk.ijse.pos.model.Customer;
+import lk.ijse.pos.model.Item;
 import lk.ijse.pos.view.tblmodel.OrderDetailTM;
 
 
@@ -30,6 +34,7 @@ import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -220,22 +225,18 @@ public class OrderFormController implements Initializable {
 
     }
 
-    private void loadAllData() throws SQLException {
-
-        Statement stm = connection.createStatement();
-        ResultSet rst = stm.executeQuery("SELECT * FROM Customer");
+    private void loadAllData() throws Exception {
+        ArrayList<Customer> allCustomers = new CustomerDAOImpl().getAllCustomers();
         cmbCustomerID.getItems().removeAll(cmbCustomerID.getItems());
-        while (rst.next()) {
-            String id = rst.getString(1);
-            cmbCustomerID.getItems().add(id);
-        }
-        rst = stm.executeQuery("SELECT * FROM Item");
-        cmbItemCode.getItems().removeAll(cmbItemCode.getItems());
-        while (rst.next()) {
-            String itemCode = rst.getString(1);
-            cmbItemCode.getItems().add(itemCode);
+        for (Customer customer: allCustomers) {
+            cmbCustomerID.getItems().add(customer.getcID());
         }
 
+        ArrayList<Item> allItems = new ItemDAOImpl().getAllItems();
+        cmbItemCode.getItems().removeAll(cmbItemCode.getItems());
+        for (Item item:allItems) {
+            cmbItemCode.getItems().add(item.getCode());
+        }
     }
 
     @FXML
