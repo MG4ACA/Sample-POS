@@ -225,18 +225,23 @@ public class OrderFormController implements Initializable {
 
     }
 
-    private void loadAllData() throws Exception {
-        ArrayList<Customer> allCustomers = new CustomerDAOImpl().getAllCustomers();
-        cmbCustomerID.getItems().removeAll(cmbCustomerID.getItems());
-        for (Customer customer: allCustomers) {
-            cmbCustomerID.getItems().add(customer.getcID());
+    private void loadAllData()  {
+        try {
+            ArrayList<Customer> allCustomers = new CustomerDAOImpl().getAllCustomers();
+            cmbCustomerID.getItems().removeAll(cmbCustomerID.getItems());
+            for (Customer customer: allCustomers) {
+                cmbCustomerID.getItems().add(customer.getcID());
+            }
+
+            ArrayList<Item> allItems = new ItemDAOImpl().getAllItems();
+            cmbItemCode.getItems().removeAll(cmbItemCode.getItems());
+            for (Item item:allItems) {
+                cmbItemCode.getItems().add(item.getCode());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        ArrayList<Item> allItems = new ItemDAOImpl().getAllItems();
-        cmbItemCode.getItems().removeAll(cmbItemCode.getItems());
-        for (Item item:allItems) {
-            cmbItemCode.getItems().add(item.getCode());
-        }
     }
 
     @FXML
@@ -335,6 +340,8 @@ public class OrderFormController implements Initializable {
                 if (rst.next()) {
                     qtyOnHand = rst.getInt(4);
                 }
+                ItemDAOImpl itemDAO = new ItemDAOImpl();
+
                 PreparedStatement pstm2 = connection.prepareStatement("UPDATE Item SET qtyOnHand=? WHERE code=?");
                 pstm2.setObject(1, qtyOnHand - orderDetail.getQty());
                 pstm2.setObject(2, orderDetail.getItemCode());

@@ -2,7 +2,6 @@ package lk.ijse.pos.dao;
 
 import lk.ijse.pos.db.DBConnection;
 import lk.ijse.pos.model.Customer;
-import lk.ijse.pos.view.tblmodel.CustomerTM;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,25 +17,28 @@ public class CustomerDAOImpl {
         pstm.setObject(2, customer.getName());
         pstm.setObject(3, customer.getAddress());
         pstm.setObject(4, 0);
-        return (pstm.executeUpdate()>0);
+        return (pstm.executeUpdate() > 0);
 
     }
 
     public boolean deleteCustomer(String id) throws Exception {
         Connection connection = DBConnection.getInstance().getConnection();
         PreparedStatement pstm = connection.prepareStatement("DELETE FROM Customer WHERE id=?");
-        pstm.setObject(1,id);
-        return (pstm.executeUpdate()>0);
+        pstm.setObject(1, id);
+        return (pstm.executeUpdate() > 0);
     }
 
-//    public Customer searchCustomer(String id) throws Exception {
-////        Connection connection = DBConnection.getInstance().getConnection();
-////        PreparedStatement pstm = connection.prepareStatement("SELECT * FROM Customer WHERE id=?");
-////        pstm.setObject(1,id);
-////
-////         return pstm.executeQuery();
-//
-//    }
+    public Customer searchCustomer(String id) throws Exception {
+        Connection connection = DBConnection.getInstance().getConnection();
+        PreparedStatement stm = connection.prepareStatement("SELECT * FROM Customer where id=?");
+        stm.setObject(1,id);
+        ResultSet rst = stm.executeQuery();
+        if (rst.next()) {
+            return new Customer(rst.getString("id"), rst.getString("name"), rst.getString("address"));
+        }
+        return null;
+
+    }
 
     public boolean UpdateCustomer(Customer customer) throws Exception {
         Connection connection = DBConnection.getInstance().getConnection();

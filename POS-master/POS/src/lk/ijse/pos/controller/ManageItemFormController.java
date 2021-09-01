@@ -189,4 +189,18 @@ public class ManageItemFormController implements Initializable{
         }
     }
 
+    public void searchItem_OnAction(ActionEvent actionEvent) {
+        try {
+            Item item = new ItemDAOImpl().searchItem(txtItemCode.getText());
+            if (item!=null) {
+                txtDescription.setText(item.getDescription());
+                txtQty.setText(String.valueOf(item.getQtyOnHand()));
+                txtUnitPrice.setText(String.valueOf(item.getUnitPrice()));
+            }else {
+                new Alert(Alert.AlertType.WARNING,"Wrong Item Code").show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

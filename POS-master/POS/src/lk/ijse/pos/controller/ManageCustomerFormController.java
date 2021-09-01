@@ -184,4 +184,26 @@ public class ManageCustomerFormController implements Initializable {
 
     }
 
+    public void btnSearchCustomer_OnAction(ActionEvent actionEvent) {
+        try {
+            Customer customer = new CustomerDAOImpl().searchCustomer(txtCustomerId.getText());
+            if (customer!=null){
+                txtCustomerName.setText(customer.getName());
+                txtCustomerAddress.setText(customer.getAddress());
+            }else {
+                new Alert(Alert.AlertType.WARNING,"Wrong Details").show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//
+//        try {
+//            Customer customer = customerDAO.searchCustomer(txtCustomerId.getText());
+//            System.out.println(txtCustomerName.getText());
+//            txtCustomerName.setText(customer.getName());
+//            txtCustomerAddress.setText(customer.getAddress());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+    }
 }
