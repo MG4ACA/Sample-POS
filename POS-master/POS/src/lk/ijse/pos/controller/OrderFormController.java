@@ -22,13 +22,18 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import lk.ijse.pos.dao.CustomerDAOImpl;
 import lk.ijse.pos.dao.ItemDAOImpl;
+import lk.ijse.pos.dao.OrderDAOImpl;
+import lk.ijse.pos.dao.OrderDetailsDAOImpl;
 import lk.ijse.pos.db.DBConnection;
 import lk.ijse.pos.model.Customer;
 import lk.ijse.pos.model.Item;
+import lk.ijse.pos.model.OrderDetails;
+import lk.ijse.pos.model.Orders;
 import lk.ijse.pos.view.tblmodel.OrderDetailTM;
 
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
 import java.text.ParseException;
@@ -225,7 +230,7 @@ public class OrderFormController implements Initializable {
 
     }
 
-    private void loadAllData()  {
+    private void loadAllData(){
         try {
             ArrayList<Customer> allCustomers = new CustomerDAOImpl().getAllCustomers();
             cmbCustomerID.getItems().removeAll(cmbCustomerID.getItems());
@@ -257,7 +262,6 @@ public class OrderFormController implements Initializable {
 
     @FXML
     private void btnSaveOnAction(ActionEvent event) {
-
         String itemCode = cmbItemCode.getSelectionModel().getSelectedItem();
         int qty = Integer.parseInt(txtQty.getText());
         double unitPrice = Double.parseDouble(txtUnitPrice.getText());
@@ -307,51 +311,42 @@ public class OrderFormController implements Initializable {
     private void btnPlaceOrderOnAction(ActionEvent event) {
         try {
             connection.setAutoCommit(false);
-            String sql = "INSERT INTO Orders VALUES (?,?,?)";
-            PreparedStatement pstm = connection.prepareStatement(sql);
-            pstm.setObject(1, txtOrderID.getText());
-            pstm.setObject(2, parseDate(txtOrderDate.getEditor().getText()));
-            pstm.setObject(3, cmbCustomerID.getSelectionModel().getSelectedItem());
-            int affectedRows = pstm.executeUpdate();
-
-            if (affectedRows == 0) {
+            boolean b1 = new OrderDAOImpl().addOrder(new Orders(txtOrderID.getText(), parseDate(txtOrderDate.getEditor().getText()), cmbCustomerID.getSelectionModel().getSelectedItem()));
+            if (!b1) {
                 connection.rollback();
                 return;
             }
 
-            pstm = connection.prepareStatement("INSERT INTO OrderDetails VALUES (?,?,?,?)");
-
-
             for (OrderDetailTM orderDetail : olOrderDetails) {
-                pstm.setObject(1, txtOrderID.getText());
-                pstm.setObject(2, orderDetail.getItemCode());
-                pstm.setObject(3, orderDetail.getQty());
-                pstm.setObject(4, orderDetail.getUnitPrice());
-                affectedRows = pstm.executeUpdate();
-
-                if (affectedRows == 0) {
+                OrderDetails orderDetails = new OrderDetails(txtOrderID.getText(), orderDetail.getItemCode(), orderDetail.getQty(), new BigDecimal(orderDetail.getUnitPrice()));
+                boolean b2 = new OrderDetailsDAOImpl().addOrderDetails(orderDetails);
+                if (!b2) {
                     connection.rollback();
                     return;
                 }
                 int qtyOnHand = 0;
 
-                Statement stm = connection.createStatement();
-                ResultSet rst = stm.executeQuery("SELECT * FROM Item WHERE code='" + orderDetail.getItemCode() + "'");
-                if (rst.next()) {
-                    qtyOnHand = rst.getInt(4);
+                try {
+                    Item item = new ItemDAOImpl().searchItem(orderDetail.getItemCode());
+                    if (item!=null) {
+                        qtyOnHand=item.getQtyOnHand();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                ItemDAOImpl itemDAO = new ItemDAOImpl();
 
-                PreparedStatement pstm2 = connection.prepareStatement("UPDATE Item SET qtyOnHand=? WHERE code=?");
-                pstm2.setObject(1, qtyOnHand - orderDetail.getQty());
-                pstm2.setObject(2, orderDetail.getItemCode());
+                try {
+                    boolean b = new ItemDAOImpl().updateQtyOnHand(qtyOnHand - orderDetail.getQty(), orderDetail.getItemCode());
+                    if (!b) {
+                        connection.rollback();
+                        return;
+                    }
 
-                affectedRows = pstm2.executeUpdate();
-
-                if (affectedRows == 0) {
-                    connection.rollback();
-                    return;
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
 
             }
 
@@ -366,6 +361,8 @@ public class OrderFormController implements Initializable {
                 Logger.getLogger(OrderFormController.class.getName()).log(Level.SEVERE, null, ex1);
             }
             Logger.getLogger(OrderFormController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             try {
                 connection.setAutoCommit(true);

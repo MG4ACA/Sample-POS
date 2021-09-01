@@ -27,7 +27,7 @@
          </font>
       </Label>
       <JFXButton id="btnAddNewItem" layoutX="503.0" layoutY="26.0" onAction="#btnAddNewItem_OnAction" prefHeight="46.0" prefWidth="137.0" text="Add New Item" />
-      <JFXTextField fx:id="txtItemCode" labelFloat="true" layoutX="20.0" layoutY="95.0" prefHeight="28.0" prefWidth="615.0" promptText="Item Code :" />
+      <JFXTextField fx:id="txtItemCode" labelFloat="true" layoutX="20.0" layoutY="95.0" onAction="#searchItem_OnAction" prefHeight="28.0" prefWidth="615.0" promptText="Item Code :" />
       <JFXTextField fx:id="txtDescription" labelFloat="true" layoutX="20.0" layoutY="141.0" prefHeight="28.0" prefWidth="615.0" promptText="Description :" />
       <JFXTextField fx:id="txtUnitPrice" labelFloat="true" layoutX="20.0" layoutY="189.0" prefHeight="28.0" prefWidth="615.0" promptText="Unit Price :" />
       <JFXButton id="btnSave" layoutX="265.0" layoutY="285.0" onAction="#btnSave_OnAction" prefHeight="28.0" prefWidth="58.0" text="Save" />
