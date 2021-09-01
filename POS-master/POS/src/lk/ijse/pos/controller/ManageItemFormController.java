@@ -16,8 +16,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lk.ijse.pos.AppInitializer;
-import lk.ijse.pos.dao.ItemDAO;
-import lk.ijse.pos.dao.ItemDAOImpl;
+import lk.ijse.pos.dao.custom.ItemDAO;
+import lk.ijse.pos.dao.custom.impl.ItemDAOImpl;
 import lk.ijse.pos.model.Item;
 import lk.ijse.pos.view.tblmodel.ItemTM;
 import java.math.BigDecimal;
@@ -53,7 +53,7 @@ public class ManageItemFormController implements Initializable{
     private void loadAllItems(){
 
         try {
-            ArrayList<Item> allItems = itemDAO.getAllItems();
+            ArrayList<Item> allItems = itemDAO.getAll();
             ArrayList<ItemTM> itemTMS = new ArrayList<>();
 
             for (Item temp: allItems
@@ -135,7 +135,7 @@ public class ManageItemFormController implements Initializable{
 
             try {
 
-                boolean b = itemDAO.addItem(new Item(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText())));
+                boolean b = itemDAO.add(new Item(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText())));
                 if (b){
                     loadAllItems();
                 }else{
@@ -149,7 +149,7 @@ public class ManageItemFormController implements Initializable{
         }else{
 
             try {
-                boolean b = itemDAO.UpdateItem(new Item(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText())));
+                boolean b = itemDAO.update(new Item(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText())));
                 if (b){
                     loadAllItems();
                 }else{
@@ -172,7 +172,7 @@ public class ManageItemFormController implements Initializable{
         String code = tblItems.getSelectionModel().getSelectedItem().getCode();
 
         try {
-            boolean b = itemDAO.deleteItem(txtItemCode.getText());
+            boolean b = itemDAO.delete(txtItemCode.getText());
             if (b){
                 loadAllItems();
             }else{
@@ -185,7 +185,7 @@ public class ManageItemFormController implements Initializable{
 
     public void searchItem_OnAction(ActionEvent actionEvent) {
         try {
-            Item item = itemDAO.searchItem(txtItemCode.getText());
+            Item item = itemDAO.search(txtItemCode.getText());
             if (item!=null) {
                 txtDescription.setText(item.getDescription());
                 txtQty.setText(String.valueOf(item.getQtyOnHand()));
