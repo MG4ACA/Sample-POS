@@ -16,8 +16,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lk.ijse.pos.AppInitializer;
-import lk.ijse.pos.dao.custom.CustomerDAO;
-import lk.ijse.pos.dao.custom.impl.CustomerDAOImpl;
+import lk.ijse.pos.bo.custom.CustomerBO;
+import lk.ijse.pos.bo.custom.impl.CustomerBOImpl;
 import lk.ijse.pos.model.Customer;
 import lk.ijse.pos.view.tblmodel.CustomerTM;
 import java.net.URL;
@@ -45,12 +45,12 @@ public class ManageCustomerFormController implements Initializable {
     private JFXTextField txtCustomerAddress;
     @FXML
     private TableView<CustomerTM> tblCustomers;
-    CustomerDAO customerDAO = new CustomerDAOImpl();
+    CustomerBO customerBO = new CustomerBOImpl();
 
     private void loadAllCustomers() {
 
         try {
-            ArrayList<Customer> allCustomers = customerDAO.getAll();
+            ArrayList<Customer> allCustomers = customerBO.getAllCustomers();
             ArrayList<CustomerTM> customerTM = new ArrayList<>();
 
             for (Customer customer: allCustomers
@@ -116,7 +116,7 @@ public class ManageCustomerFormController implements Initializable {
             String customerID = tblCustomers.getSelectionModel().getSelectedItem().getId();
 
             try {
-                boolean b = customerDAO.delete(txtCustomerId.getText());
+                boolean b = customerBO.deleteCustomer(txtCustomerId.getText());
                 if (b) {
                     loadAllCustomers();
                 } else {
@@ -150,7 +150,7 @@ public class ManageCustomerFormController implements Initializable {
 
         if (addnew) {
             try {
-                boolean b = customerDAO.add(new Customer(txtCustomerId.getText(), txtCustomerName.getText(), txtCustomerAddress.getText()));
+                boolean b = customerBO.addCustomer(new Customer(txtCustomerId.getText(), txtCustomerName.getText(), txtCustomerAddress.getText()));
                 if (b) {
                     loadAllCustomers();
                 } else {
@@ -162,7 +162,7 @@ public class ManageCustomerFormController implements Initializable {
 
         } else {
             try {
-                boolean b = new CustomerDAOImpl().update(new Customer(txtCustomerName.getText(), txtCustomerAddress.getText(), txtCustomerId.getText()));
+                boolean b = customerBO.updateCustomer(new Customer(txtCustomerName.getText(), txtCustomerAddress.getText(), txtCustomerId.getText()));
                 if (b) {
                     loadAllCustomers();
                 } else {
@@ -179,7 +179,7 @@ public class ManageCustomerFormController implements Initializable {
 
     public void btnSearchCustomer_OnAction(ActionEvent actionEvent) {
         try {
-            Customer customer = customerDAO.search(txtCustomerId.getText());
+            Customer customer = customerBO.searchCustomer(txtCustomerId.getText());
             if (customer!=null){
                 txtCustomerName.setText(customer.getName());
                 txtCustomerAddress.setText(customer.getAddress());
