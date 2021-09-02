@@ -69,7 +69,7 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "Customer{" + "cID=" + cID + ", name=" + name + ", address=" + address + '}';
+        return "CustomerDTO{" + "cID=" + cID + ", name=" + name + ", address=" + address + '}';
     }
 
 

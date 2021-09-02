@@ -20,12 +20,17 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import lk.ijse.pos.bo.BOFactory;
 import lk.ijse.pos.bo.custom.CustomerBO;
 import lk.ijse.pos.bo.custom.ItemBO;
 import lk.ijse.pos.bo.custom.PurchaseOrderBO;
 import lk.ijse.pos.bo.custom.impl.CustomerBOImpl;
 import lk.ijse.pos.bo.custom.impl.ItemBOImpl;
 import lk.ijse.pos.bo.custom.impl.PurchaseOrderBOImpl;
+import lk.ijse.pos.dto.CustomerDTO;
+import lk.ijse.pos.dto.ItemDTO;
+import lk.ijse.pos.dto.OrderDetailsDTO;
+import lk.ijse.pos.dto.OrdersDTO;
 import lk.ijse.pos.model.Customer;
 import lk.ijse.pos.model.Item;
 import lk.ijse.pos.model.OrderDetails;
@@ -81,9 +86,10 @@ public class OrderFormController implements Initializable {
     @FXML
     private JFXDatePicker txtOrderDate;
 
-    private final PurchaseOrderBO purchaseOrderBO = new PurchaseOrderBOImpl();
-    private final CustomerBO customerBO=new CustomerBOImpl();
-    private final ItemBO itemBO=new ItemBOImpl();
+    private final ItemBO itemBO = (ItemBO) BOFactory.getInstance().getBo(BOFactory.getType.ITEM);
+    private final CustomerBO customerBO = (CustomerBO) BOFactory.getInstance().getBo(BOFactory.getType.CUSTOMER);
+    private final PurchaseOrderBO purchaseOrderBO = (PurchaseOrderBO) BOFactory.getInstance().getBo(BOFactory.getType.ORDER);
+
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -122,7 +128,7 @@ public class OrderFormController implements Initializable {
                 }
 
                 try {
-                    Customer customer = customerBO.searchCustomer(customerID);
+                    CustomerDTO customer = customerBO.searchCustomer(customerID);
                     if (customer!=null) {
                         txtCustomerName.setText(customer.getName());
                     }
@@ -151,7 +157,7 @@ public class OrderFormController implements Initializable {
                 }
 
                 try {
-                    Item item = itemBO.searchItem(itemCode);
+                    ItemDTO item = itemBO.searchItem(itemCode);
                     if (item!=null) {
                         String description = item.getDescription();
                         BigDecimal unitPrice = item.getUnitPrice();
@@ -223,15 +229,15 @@ public class OrderFormController implements Initializable {
 
     private void loadAllData(){
         try {
-            ArrayList<Customer> allCustomers = customerBO.getAllCustomers();
+            ArrayList<CustomerDTO> allCustomers = customerBO.getAllCustomers();
             cmbCustomerID.getItems().removeAll(cmbCustomerID.getItems());
-            for (Customer customer: allCustomers) {
+            for (CustomerDTO customer: allCustomers) {
                 cmbCustomerID.getItems().add(customer.getcID());
             }
 
-            ArrayList<Item> allItems = itemBO.getAllItems();
+            ArrayList<ItemDTO> allItems = itemBO.getAllItems();
             cmbItemCode.getItems().removeAll(cmbItemCode.getItems());
-            for (Item item:allItems) {
+            for (ItemDTO item:allItems) {
                 cmbItemCode.getItems().add(item.getCode());
             }
         } catch (Exception e) {
@@ -300,21 +306,22 @@ public class OrderFormController implements Initializable {
 
     @FXML
     private void btnPlaceOrderOnAction(ActionEvent event) {
-        Orders orders = new Orders(txtOrderID.getText(), parseDate(txtOrderDate.getEditor().getText()), cmbCustomerID.getSelectionModel().getSelectedItem());
 
-        ArrayList<OrderDetails> allOrderDetails=new ArrayList<>();
+        ArrayList<OrderDetailsDTO> allOrderDetails=new ArrayList<>();
 
         for (OrderDetailTM detailTM : olOrderDetails
                 ) {
-                    OrderDetails orderDetails = new OrderDetails(
+                    OrderDetailsDTO orderDetails = new OrderDetailsDTO(
                             txtOrderID.getText(),
                             detailTM.getItemCode(),
                             detailTM.getQty(),
                             new BigDecimal(detailTM.getUnitPrice()));
                     allOrderDetails.add(orderDetails);
         }
+        OrdersDTO ordersDTO = new OrdersDTO(txtOrderID.getText(), parseDate(txtOrderDate.getEditor().getText()), cmbCustomerID.getSelectionModel().getSelectedItem(),allOrderDetails);
+
         try {
-            boolean b = purchaseOrderBO.addOrder(orders, allOrderDetails);
+            boolean b = purchaseOrderBO.addOrder(ordersDTO);
             if (b){
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Order Placed", ButtonType.OK);
                 alert.show();

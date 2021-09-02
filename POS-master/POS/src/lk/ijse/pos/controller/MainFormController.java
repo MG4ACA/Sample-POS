@@ -83,7 +83,7 @@ public class MainFormController implements Initializable {
                     lblDescription.setText("Click to add, edit, delete, search or view items");
                     break;
                 case "imgOrder":
-                    lblMenu.setText("Place Orders");
+                    lblMenu.setText("Place OrdersDTO");
                     lblDescription.setText("Click here if you want to place a new order");
                     break;
                 case "imgReport":

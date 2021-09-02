@@ -58,7 +58,7 @@ public class OrderDetails {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("OrderDetails{");
+        final StringBuffer sb = new StringBuffer("OrderDetailsDTO{");
         sb.append("orderId='").append(orderId).append('\'');
         sb.append(", itemCode='").append(itemCode).append('\'');
         sb.append(", qty=").append(qty);

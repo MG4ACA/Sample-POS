@@ -65,7 +65,7 @@ public class Orders {
 
     @Override
     public String toString() {
-        return "Orders{" + "id=" + id + ", date=" + date + ", customerId=" + customerId + '}';
+        return "OrdersDTO{" + "id=" + id + ", date=" + date + ", customerId=" + customerId + '}';
     }
 
 }

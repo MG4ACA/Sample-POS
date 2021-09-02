@@ -10,17 +10,17 @@ import java.util.ArrayList;
 public class CustomerDAOImpl implements CustomerDAO {
     @Override
     public boolean add(Customer customer) throws Exception {
-        return CrudUtils.executeUpdate("INSERT INTO Customer VALUES (?,?,?,?)",customer.getcID(),customer.getName(),customer.getAddress(),0);
+        return CrudUtils.executeUpdate("INSERT INTO CustomerDTO VALUES (?,?,?,?)",customer.getcID(),customer.getName(),customer.getAddress(),0);
     }
 
     @Override
     public boolean delete(String id) throws Exception {
-        return CrudUtils.executeUpdate("DELETE FROM Customer WHERE id=?",id);
+        return CrudUtils.executeUpdate("DELETE FROM CustomerDTO WHERE id=?",id);
     }
 
     @Override
     public Customer search(String id) throws Exception {
-        ResultSet rst = CrudUtils.executeQuarry("SELECT * FROM Customer where id=?", id);
+        ResultSet rst = CrudUtils.executeQuarry("SELECT * FROM CustomerDTO where id=?", id);
         if (rst.next()) {
             return new Customer(rst.getString("id"), rst.getString("name"), rst.getString("address"));
         }
@@ -28,12 +28,12 @@ public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
     public boolean update(Customer customer) throws Exception {
-        return CrudUtils.executeUpdate("UPDATE Customer SET name=?, address=? WHERE id=?",customer.getName(),customer.getAddress(),customer.getcID());
+        return CrudUtils.executeUpdate("UPDATE CustomerDTO SET name=?, address=? WHERE id=?",customer.getName(),customer.getAddress(),customer.getcID());
     }
 
     @Override
     public ArrayList<Customer> getAll() throws Exception {
-        ResultSet rst = CrudUtils.executeQuarry("SELECT * FROM Customer");
+        ResultSet rst = CrudUtils.executeQuarry("SELECT * FROM CustomerDTO");
         ArrayList<Customer> alCustomers = new ArrayList<>();
         while (rst.next()) {
 

@@ -16,8 +16,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lk.ijse.pos.AppInitializer;
+import lk.ijse.pos.bo.BOFactory;
+import lk.ijse.pos.bo.custom.CustomerBO;
 import lk.ijse.pos.bo.custom.ItemBO;
 import lk.ijse.pos.bo.custom.impl.ItemBOImpl;
+import lk.ijse.pos.dto.ItemDTO;
 import lk.ijse.pos.model.Item;
 import lk.ijse.pos.view.tblmodel.ItemTM;
 import java.math.BigDecimal;
@@ -48,15 +51,15 @@ public class ManageItemFormController implements Initializable{
     @FXML
     private TableView<ItemTM> tblItems;
     private boolean addNew = true;
-    ItemBO itemBO = new ItemBOImpl();
+    private ItemBO itemBO = (ItemBO) BOFactory.getInstance().getBo(BOFactory.getType.ITEM);
 
     private void loadAllItems(){
 
         try {
-            ArrayList<Item> allItems = itemBO.getAllItems();
+            ArrayList<ItemDTO> allItems = itemBO.getAllItems();
             ArrayList<ItemTM> itemTMS = new ArrayList<>();
 
-            for (Item temp: allItems
+            for (ItemDTO temp: allItems
                  ) {
                 itemTMS.add(new ItemTM(temp.getCode(),temp.getDescription(),temp.getUnitPrice(), temp.getQtyOnHand()));
             }
@@ -135,7 +138,7 @@ public class ManageItemFormController implements Initializable{
 
             try {
 
-                boolean b = itemBO.addItem(new Item(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText())));
+                boolean b = itemBO.addItem(new ItemDTO(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText())));
                 if (b){
                     loadAllItems();
                 }else{
@@ -149,7 +152,7 @@ public class ManageItemFormController implements Initializable{
         }else{
 
             try {
-                boolean b = itemBO.updateItem(new Item(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText())));
+                boolean b = itemBO.updateItem(new ItemDTO(txtItemCode.getText(), txtDescription.getText(), new BigDecimal(txtUnitPrice.getText()), Integer.parseInt(txtQty.getText())));
                 if (b){
                     loadAllItems();
                 }else{
@@ -185,13 +188,13 @@ public class ManageItemFormController implements Initializable{
 
     public void searchItem_OnAction(ActionEvent actionEvent) {
         try {
-            Item item = itemBO.searchItem(txtItemCode.getText());
+            ItemDTO item = itemBO.searchItem(txtItemCode.getText());
             if (item!=null) {
                 txtDescription.setText(item.getDescription());
                 txtQty.setText(String.valueOf(item.getQtyOnHand()));
                 txtUnitPrice.setText(String.valueOf(item.getUnitPrice()));
             }else {
-                new Alert(Alert.AlertType.WARNING,"Wrong Item Code").show();
+                new Alert(Alert.AlertType.WARNING,"Wrong ItemDTO Code").show();
             }
         } catch (Exception e) {
             e.printStackTrace();
